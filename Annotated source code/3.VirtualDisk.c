@@ -1,4 +1,4 @@
-//Linux内核驱动开发代码3：字符设备驱动程序框架。教材第96页6.1
+//Linux内核驱动开发代码3：字符设备驱动程序框架。
 /*******************************************************/
 #include <linux/init.h>	  //Linux内核中定义了初始化数据相关的宏的头文件（module_init和moudle_exit的定义在这里）
 #include <linux/module.h> //Linux内核中定义了模块相关处理的头文件，用于动态加载模块至内核（Dynamic loading of modules into the kernel.）

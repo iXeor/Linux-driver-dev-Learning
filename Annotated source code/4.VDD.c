@@ -1,8 +1,7 @@
 //Linux内核驱动开发代码4：字符设备驱动程序框架。
 /***********************************************************************/
 #define VIRTUALDISK_SIZE 100 //宏定义，用于设定memory大小
-#define VIRTUALDISK_NUM 200	 //宏定义，设置虚拟磁盘最大100Byte
-
+#define VIRTUALDISK_NUM 200	 //宏定义，设置主设备号初始值为200
 #include <linux/init.h>	  //Linux内核中定义了初始化数据相关的宏的头文件（module_init和moudle_exit的定义在这里）
 #include <linux/module.h> //Linux内核中定义了模块相关处理的头文件，用于动态加载模块至内核（Dynamic loading of modules into the kernel.）
 #include <linux/fs.h>	  //Linux内核中定义了一些重要的文件表结构之类的头文件 (This file has definitions for some important file table structures etc.)

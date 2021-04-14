@@ -1,8 +1,8 @@
-#define VIRTUALDISK_SIZE 0xFFFF
+#define VIRTUALDISK_SIZE 8192
 #define VIRTUALDISK_NUM 200
-#define MEM_CLEAR 0x1
-#define PORT1_SET 0x2
-#define PORT2_SET 0x3
+#define MEM_CLEAR 1
+#define PORT1_SET 2
+#define PORT2_SET 3
 
 #include <linux/init.h>
 #include <linux/module.h>
@@ -28,8 +28,9 @@ vdDriver *VirtualDisk_devp;
 
 int Virtualdisk_open(struct inode *inode,struct file *fp)
 {
-	vdDriver *devp = fp->private_data;
-	fp->private_data = VirtualDisk_devp;	
+	vdDriver *devp;
+	fp->private_data = VirtualDisk_devp;
+	devp = fp->private_data;
 	devp->count++;
 	return 0;
 }
@@ -130,7 +131,7 @@ static loff_t Virtualdisk_llseek(struct file *fp,loff_t offset,int o)
 	}
 	return result;
 }
-static int Virtualdisk_ioctl(struct inode *inodep,struct file *fp,unsigned int cmd,unsigned long arg)
+static long Virtualdisk_ioctl(struct file *fp,unsigned int cmd,unsigned long arg)
 {
 	vdDriver *devp = fp->private_data;
 	switch(cmd)
@@ -157,7 +158,7 @@ static const struct file_operations vdd_fops = {
 	.llseek = Virtualdisk_llseek,
 	.read = Virtualdisk_read,
 	.write = Virtualdisk_write,
-	.ioctl = Virtualdisk_ioctl,
+	.unlocked_ioctl = Virtualdisk_ioctl,
 	.open = Virtualdisk_open,
 	.release = Virtualdisk_release,
 };

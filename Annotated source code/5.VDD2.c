@@ -36,8 +36,9 @@ vdDriver *VirtualDisk_devp; //初始化一个vdDriver类型的指针
 
 int Virtualdisk_open(struct inode *inode, struct file *fp) //方法Virtualdisk_open
 {
-	vdDriver *devp = fp->private_data;	 //初始化一个vdDriver类型的指针，将文件结构体中的私有数据传递给该指针
+	vdDriver *devp;	 //初始化一个vdDriver类型的指针，将文件结构体中的私有数据传递给该指针(避免C90混合警告，先声明变量，后赋值)
 	fp->private_data = VirtualDisk_devp; //将VirtualDisk_devp的地址递交到文件结构体中的私有数据，完成初步挂载。
+	devp = fp->private_data;
 	devp->count++;						 //设备计数器+1
 	return 0;							 //正常打开设备返回0
 }
@@ -138,7 +139,8 @@ static loff_t Virtualdisk_llseek(struct file *fp, loff_t offset, int o) //方法
 	}
 	return result; //返回结果值
 }
-static int Virtualdisk_ioctl(struct inode *inodep, struct file *fp, unsigned int cmd, unsigned long arg) //方法Virtualdisk_ioctl
+//static int Virtualdisk_ioctl(struct inode* inode,struct file* fp, unsigned int cmd,unsigned long arg) //旧版本的ioctl指针
+static long Virtualdisk_ioctl(struct file *fp,unsigned int cmd,unsigned long arg) //方法Virtualdisk_ioctl （在Kernel 2.6.36中已经完全删除了file_operations中的ioctl函数指针，取而代之的是unlocked_ioctl，这里使用unlocked_ioctl）
 {
 	vdDriver *devp = fp->private_data; //初始化一个vdDriver类型的指针，将文件结构体中的私有数据传递给该指针
 	switch (cmd)					   //分支选择，根据传入的指令码
@@ -166,7 +168,8 @@ static const struct file_operations vdd_fops = {
 	.llseek = Virtualdisk_llseek,	//设置指针方法为Virtualdisk_llseek
 	.read = Virtualdisk_read,		//设置读操作方法为Virtualdisk_read
 	.write = Virtualdisk_write,		//设置写操作方法为Virtualdisk_write
-	.ioctl = Virtualdisk_ioctl,		//设置输入输出控制方法为Virtualdisk_ioctl
+	//.ioctl = Virtualdisk_ioctl,		//设置输入输出控制方法为Virtualdisk_ioctl
+	.unlocked_ioctl = Virtualdisk_ioctl,//设置输入输出控制方法为Virtualdisk_ioctl（Kernel 2.6.36以上版本使用该语句）
 	.open = Virtualdisk_open,		//设置挂载方法为Virtualdisk_open
 	.release = Virtualdisk_release, //设置释放方法为Virtualdisk_release
 };
